@@ -188,6 +188,8 @@ int main(int argc, char *argv[])
   }
 
   // TODO
+  // refactor the code to use OOP
+  // create unit tests
 
   return 0;
 }
