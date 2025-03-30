@@ -11,10 +11,6 @@ public:
     ~KeyBindManager();
 
 private:
-    std::string exec(const char*);
-    std::string removeWhitespace(std::string str);
-    std::string getSubSchemas();
-    std::vector<std::string> getUserInput();
 };
 
 #endif
