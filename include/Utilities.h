@@ -1,3 +1,6 @@
+#ifndef UTILITIES_H
+#define UTILITIES_H
+
 #include <boost/process.hpp>
 #include <boost/process/search_path.hpp>
 
@@ -21,3 +24,5 @@ namespace KeyBinder
         return result;
     }
 }
+
+#endif // UTILITIES_H
