@@ -14,6 +14,11 @@ echo Running tests...
 
 cd ..
 
+###TODO: do this last
+
+
+
+
 # # Setup bash completion
 # echo -e "\nSetting up command completion..."
 # cat > gnomekeybinder-completion.bash << 'EOF'

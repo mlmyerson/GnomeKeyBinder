@@ -22,7 +22,7 @@ void usage()
 }
 
 // execute a system command and return the output
-std::string exec(const char *cmd)
+std::string old_exec(const char *cmd)
 {
   std::array<char, 128> buffer;
   std::string result;
@@ -58,7 +58,7 @@ std::string getSubSchemas()
   // path to schema
   std::string get_sub_schemas_list = "gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings";
   // get the list of subschemas
-  std::string sub_schema_list = exec(get_sub_schemas_list.c_str());
+  std::string sub_schema_list = old_exec(get_sub_schemas_list.c_str());
   return sub_schema_list;
 }
 
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
   else if (argv[1] == RESET_SCHEMA)
   {
     std::string reset_schema = "gsettings reset org.gnome.settings-daemon.plugins.media-keys custom-keybindings";
-    exec(reset_schema.c_str());
+    old_exec(reset_schema.c_str());
     std::cout << "Subschemas for " << "custom-keybindings" << ": " << getSubSchemas() << std::endl;
   }
   else if (argv[1] == ADD_KEY)
@@ -125,14 +125,14 @@ int main(int argc, char *argv[])
 
     //set the keybinding
     std::string set_binding = add_keybinding + " " + new_list;
-    exec(set_binding.c_str());
+    old_exec(set_binding.c_str());
 
     //set the name
-    exec((set_binding + " name '" + name + "'").c_str());
+    old_exec((set_binding + " name '" + name + "'").c_str());
     //set the command
-    exec((set_binding + " command '" + command + "'").c_str());
+    old_exec((set_binding + " command '" + command + "'").c_str());
     //set the binding
-    exec((set_binding + " binding '" + binding + "'").c_str());
+    old_exec((set_binding + " binding '" + binding + "'").c_str());
 
     std::cout << "Keybinding added: " << name << std::endl;
   }
@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
     std::string schema_path = "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/" + name + "/";
     std::string cleanup_cmd = "gsettings reset-recursively org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:" + schema_path;
     std::cout << "Cleaning up orphaned data with command: " << cleanup_cmd << std::endl;
-    exec(cleanup_cmd.c_str());
+    old_exec(cleanup_cmd.c_str());
     
     // Check if this path exists in the current list
     if (current_list.find(path_to_remove) != std::string::npos) {
@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
       
       // Update the keybindings list
       std::string update_cmd = "gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings '" + current_list + "'";
-      exec(update_cmd.c_str());
+      old_exec(update_cmd.c_str());
       
       std::cout << "Keybinding '" << name << "' removed." << std::endl;
     } else {
