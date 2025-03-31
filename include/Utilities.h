@@ -3,11 +3,7 @@
 
 namespace KeyBinder
 {
-    const std::string custom_keybindings_dot_schema_path = "org.gnome.settings-daemon.plugins.media-keys";
 
-    const std::string custom_keybindings_slash_schema_path = "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/";
-
-    // Replace your current exec function with this
     std::string exec(const std::string &cmd)
     {
         namespace bp = boost::process;
