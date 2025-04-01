@@ -69,15 +69,22 @@ namespace KeyBinder
             cmd = "gsettings set " + custom_keybindings_dot_schema_path + ".custom-keybinding:" + custom_keybindings_slash_schema_path + new_key + "/ name '" + name + "'";
             
 
-            // set command
-            cmd = "gsettings set " + custom_keybindings_dot_schema_path + ".custom-keybinding:" + custom_keybindings_slash_schema_path + new_key + "/ command '" + key_command + "'";
+            // Escape the command properly for shell execution
+            std::string escaped_cmd = key_command;
+            
+            // First, replace any existing double quotes with escaped quotes
+            std::string::size_type pos = 0;
+            while ((pos = escaped_cmd.find("\"", pos)) != std::string::npos) {
+                escaped_cmd.replace(pos, 1, "\\\"");
+                pos += 2;
+            }
+            
+            // Use double quotes around the whole command parameter
+            cmd = "gsettings set " + custom_keybindings_dot_schema_path + 
+                  ".custom-keybinding:" + custom_keybindings_slash_schema_path + 
+                  new_key + "/ command \"" + escaped_cmd + "\"";
+            
             exec(cmd);
-
-
-            std::cout << std::endl;
-            std::cout << cmd << std::endl;
-            std::cout << std::endl;
-            std::cout << "debug keybinding cmd: " << exec(cmd) << std::endl;
 
 
             // set keybinding

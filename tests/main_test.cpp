@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(test_dconf_backup)
 
     // add a setting to gsettings
     std::string name = "test_keybinding";
-    std::string key_cmd = "echo 'Hello World'";
+    std::string key_cmd = "echo Hello World";
     std::string key_bind = "<Ctrl>h";
     dconf_settings.addKeyBinding(name, key_cmd, key_bind);
 
@@ -43,9 +43,6 @@ BOOST_AUTO_TEST_CASE(test_dconf_backup)
     // check if the name, command, and binding were set correctly
     std::string result = KeyBinder::exec("gsettings list-recursively org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/" + dconf_settings.name_prepend + name + "/");
 
-    std::cout << "debug result" << std::endl;
-    std::cout << result << std::endl;
-    exit(0);
     BOOST_TEST_REQUIRE(result.find("name '" + name + "'") != std::string::npos, "Keybinding name not found");
 
     BOOST_TEST_REQUIRE(result.find("command '" + key_cmd + "'") != std::string::npos, "Keybinding command not found");
