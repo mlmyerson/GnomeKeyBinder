@@ -7,19 +7,31 @@
 namespace KeyBinder
 {
 
-    std::string exec(const std::string &cmd)
+    inline std::string exec(const std::string &cmd)
     {
         namespace bp = boost::process;
 
         std::string result;
-        bp::ipstream pipe_stream;
-        bp::child c(cmd, bp::std_out > pipe_stream, bp::std_err > pipe_stream);
+        bp::ipstream out_stream;
+        bp::ipstream err_stream;
 
-        std::string line;
-        while (pipe_stream && std::getline(pipe_stream, line))
-            result += line + "\n";
+        try
+        {
+            bp::child c(cmd, bp::std_out > out_stream, bp::std_err > err_stream);
 
-        c.wait();
+            std::string line;
+            while (out_stream && std::getline(out_stream, line))
+                result += line + "\n";
+
+            while (err_stream && std::getline(err_stream, line))
+                result += "ERROR: " + line + "\n";
+
+            c.wait();
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << "Error executing command: " << e.what() << std::endl;
+        }
 
         return result;
     }

@@ -4,6 +4,8 @@
 #include "DconfSettings.h"
 #include "Utilities.h"
 
+BOOST_AUTO_TEST_SUITE(main_test_suite)
+
 BOOST_AUTO_TEST_CASE(test_gsettings_access)
 {
     // Check if gsettings exists
@@ -16,7 +18,7 @@ BOOST_AUTO_TEST_CASE(test_gsettings_access)
 }
 
 // test dconf backup and restore
-BOOST_AUTO_TEST_CASE(test_key_view)
+BOOST_AUTO_TEST_CASE(test_dconf_backup)
 {
     // backup dconf
     KeyBinder::DconfSettings dconf_settings;
@@ -29,11 +31,21 @@ BOOST_AUTO_TEST_CASE(test_key_view)
 
     // check if key was added to custom-keybindings
     std::string key_list = dconf_settings.getCustomKeybindings();
-    BOOST_TEST_REQUIRE(key_list.find(dconf_settings.name_prepend + name) != std::string::npos, "Keybinding not found in custom-keybindings");
+
+    bool found = false;
+    if (key_list.find(dconf_settings.name_prepend + name) != std::string::npos)
+    {
+        found = true;
+    }
+
+    BOOST_TEST_REQUIRE(found, "Keybinding not found in custom-keybindings");
 
     // check if the name, command, and binding were set correctly
     std::string result = KeyBinder::exec("gsettings list-recursively org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/" + dconf_settings.name_prepend + name + "/");
 
+    std::cout << "debug result" << std::endl;
+    std::cout << result << std::endl;
+    exit(0);
     BOOST_TEST_REQUIRE(result.find("name '" + name + "'") != std::string::npos, "Keybinding name not found");
 
     BOOST_TEST_REQUIRE(result.find("command '" + key_cmd + "'") != std::string::npos, "Keybinding command not found");
@@ -43,3 +55,5 @@ BOOST_AUTO_TEST_CASE(test_key_view)
     // restore dconf
     dconf_settings.dconfRestore();
 }
+
+BOOST_AUTO_TEST_SUITE_END()

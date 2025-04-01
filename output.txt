@@ -1,0 +1,20 @@
+Building GnomeKeyBinder...
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/michael/repos/GnomeKeyBinder/build
+[ 50%] Built target GnomeKeyBinder
+[ 75%] Building CXX object CMakeFiles/GnomeKeyBinderTest.dir/tests/main_test.cpp.o
+[100%] Linking CXX executable GnomeKeyBinderTest
+[100%] Built target GnomeKeyBinderTest
+Running tests...
+Running 2 test cases...
+[1;34;49mEntering test module "MyTestModule"
+[0;39;49m[1;34;49m/home/michael/repos/GnomeKeyBinder/tests/main_test.cpp(7): Entering test suite "main_test_suite"
+[0;39;49m[1;34;49m/home/michael/repos/GnomeKeyBinder/tests/main_test.cpp(9): Entering test case "test_gsettings_access"
+[0;39;49m[1;34;49m/home/michael/repos/GnomeKeyBinder/tests/main_test.cpp(9): Leaving test case "test_gsettings_access"; testing time: 4769us
+[0;39;49m[1;34;49m/home/michael/repos/GnomeKeyBinder/tests/main_test.cpp(21): Entering test case "test_dconf_backup"
+[0;39;49m/home/michael/repos/GnomeKeyBinder/tests/main_test.cpp(34): [4;31;49mfatal error: in "main_test_suite/test_dconf_backup": Keybinding not found in custom-keybindings[0;39;49m
+[1;34;49m/home/michael/repos/GnomeKeyBinder/tests/main_test.cpp(21): Leaving test case "test_dconf_backup"; testing time: 18134us
+[0;39;49m[1;34;49m/home/michael/repos/GnomeKeyBinder/tests/main_test.cpp(7): Leaving test suite "main_test_suite"; testing time: 22979us
+[0;39;49m[1;34;49mLeaving test module "MyTestModule"; testing time: 23001us
+[0;39;49m

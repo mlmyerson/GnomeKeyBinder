@@ -19,13 +19,6 @@ namespace KeyBinder
     public:
         std::string name_prepend = "custom_";
 
-        DconfSettings()
-        {
-            // Backup dconf settings
-            dconf_backup_store = dconfBackup();
-        }
-
-        ~DconfSettings();
 
         std::string dconfBackup()
         {
@@ -65,24 +58,41 @@ namespace KeyBinder
 
             std::string new_key = name_prepend + name;
             // append new key to list
-            bindings_list.insert(bindings_list.length() - 1, add_comma + custom_keybindings_slash_schema_path + new_key + "/'");
+            bindings_list.insert(bindings_list.length() - 2, add_comma + "'" + custom_keybindings_slash_schema_path + new_key + "/'");
+
 
             // set the new list
             std::string cmd = "gsettings set " + custom_keybindings_dot_schema_path + " custom-keybindings " + bindings_list;
             exec(cmd);
 
             // set name
-            cmd = "gsettings set " + custom_keybindings_dot_schema_path + " custom-keybindings:" + custom_keybindings_slash_schema_path + new_key + " name '" + name + "'";
-            exec(cmd);
+            cmd = "gsettings set " + custom_keybindings_dot_schema_path + ".custom-keybinding:" + custom_keybindings_slash_schema_path + new_key + "/ name '" + name + "'";
+            
 
             // set command
-            cmd = "gsettings set " + custom_keybindings_dot_schema_path + " custom-keybindings:" + custom_keybindings_slash_schema_path + new_key + " name '" + key_command + "'";
+            cmd = "gsettings set " + custom_keybindings_dot_schema_path + ".custom-keybinding:" + custom_keybindings_slash_schema_path + new_key + "/ command '" + key_command + "'";
             exec(cmd);
 
+
+            std::cout << std::endl;
+            std::cout << cmd << std::endl;
+            std::cout << std::endl;
+            std::cout << "debug keybinding cmd: " << exec(cmd) << std::endl;
+
+
             // set keybinding
-            cmd = "gsettings set " + custom_keybindings_dot_schema_path + " custom-keybindings:" + custom_keybindings_slash_schema_path + new_key + " name '" + binding + "'";
+            cmd = "gsettings set " + custom_keybindings_dot_schema_path + ".custom-keybinding:" + custom_keybindings_slash_schema_path + new_key + "/ binding '" + binding + "'";
             exec(cmd);
         }
+
+
+        DconfSettings()
+        {
+            // Backup dconf settings
+            dconf_backup_store = dconfBackup();
+        }
+
+        ~DconfSettings(){}
     };
 }
 
