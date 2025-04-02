@@ -33,11 +33,12 @@ namespace KeyBinder
             std::string cmd = "sh -c \"dconf load / < " + temp_file + "\"";
             exec(cmd);
             // Delete dconf cache
-            cmd = "rm -rf ~/.config/dconf";
-            //exec(cmd);
+            cmd = "sh -c \"rm -rf ~/.config/dconf\"";
+            std::cout << "debug executing rm command " << exec(cmd) << std::endl;
+            exec(cmd);
             // Force dconf to reload by killing the service (it will restart automatically)
-            cmd = "killall dconf-service";
-            //exec(cmd);
+            cmd = "sh -c 'killall dconf-service'";
+            exec(cmd);
 
             // Give the service a moment to restart if needed
             usleep(100000); // 100ms
@@ -47,6 +48,13 @@ namespace KeyBinder
         std::string getCustomKeybindings()
         {
             std::string key_list = exec("gsettings get " + custom_keybindings_dot_schema_path + " custom-keybindings");
+            std::string substr = "@as"; 
+
+            std::string::size_type pos = key_list.find(substr);
+            if (pos != std::string::npos)
+            {
+                key_list.erase(pos, substr.length());
+            }
 
             return key_list;
         }
@@ -81,12 +89,16 @@ namespace KeyBinder
             bindings_list.insert(bindings_list.length() - 2, add_comma + "'" + custom_keybindings_slash_schema_path + new_key + "/'");
 
             // set the new list
-            std::string cmd = "gsettings set " + custom_keybindings_dot_schema_path + " custom-keybindings " + bindings_list;
-            std::cout << "debug cmd: " << cmd << std::endl;
+            std::string cmd = "sh -c \"gsettings set " + custom_keybindings_dot_schema_path + " custom-keybindings " + bindings_list + "\"";
+            std::cout << "debug new key cmd: " << cmd << std::endl;
             exec(cmd);
 
-            // set name
-            cmd = "gsettings set " + custom_keybindings_dot_schema_path + ".custom-keybinding:" + custom_keybindings_slash_schema_path + new_key + "/ name '" + name + "'";
+            // set name - fixed quotes
+            cmd = "sh -c \"gsettings set " + custom_keybindings_dot_schema_path + 
+                  ".custom-keybinding:" + custom_keybindings_slash_schema_path + 
+                  new_key + "/ name \\\"" + name + "\\\"\"";
+            std::cout << "debug set name cmd: " << cmd << std::endl;
+            exec(cmd);
 
             // Escape the command properly for shell execution
             std::string escaped_cmd = key_command;
@@ -100,14 +112,15 @@ namespace KeyBinder
             }
 
             // Use double quotes around the whole command parameter
-            cmd = "gsettings set " + custom_keybindings_dot_schema_path +
+            cmd = "sh -c \"gsettings set " + custom_keybindings_dot_schema_path +
                   ".custom-keybinding:" + custom_keybindings_slash_schema_path +
-                  new_key + "/ command \"" + escaped_cmd + "\"";
-
+                  new_key + "/ command \\\"" + escaped_cmd + "\\\"\"";
             exec(cmd);
 
-            // set keybinding
-            cmd = "gsettings set " + custom_keybindings_dot_schema_path + ".custom-keybinding:" + custom_keybindings_slash_schema_path + new_key + "/ binding '" + binding + "'";
+            // set keybinding - fixed quotes
+            cmd = "sh -c \"gsettings set " + custom_keybindings_dot_schema_path + 
+                  ".custom-keybinding:" + custom_keybindings_slash_schema_path + 
+                  new_key + "/ binding \\\"" + binding + "\\\"\"";
             exec(cmd);
         }
 
@@ -120,7 +133,9 @@ namespace KeyBinder
             ofs.close();
         }
 
-        ~DconfSettings() {}
+        ~DconfSettings() {
+        }
+        
     };
 }
 

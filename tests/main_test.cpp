@@ -35,26 +35,27 @@ BOOST_AUTO_TEST_CASE(test_dconf_backup)
     // check if key was removed from custom-keybindings
     std::cout << "debug key_list: " << key_list << std::endl;
 
-    BOOST_TEST_REQUIRE(key_list.find(dconf_settings.name_prepend + name) != std::string::npos, "Keybinding not found in custom-keybindings");
+    BOOST_TEST(key_list.find(dconf_settings.name_prepend + name) != std::string::npos, "Keybinding not found in custom-keybindings");
 
     // check if the name, command, and binding were set correctly
     std::string result = KeyBinder::exec("gsettings list-recursively org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/" + dconf_settings.name_prepend + name + "/");
 
-    BOOST_TEST_REQUIRE(result.find("name '" + name + "'") != std::string::npos, "Keybinding name not found");
+    BOOST_TEST(result.find("name '" + name + "'") != std::string::npos, "Keybinding name not found");
 
-    BOOST_TEST_REQUIRE(result.find("command '" + key_cmd + "'") != std::string::npos, "Keybinding command not found");
+    BOOST_TEST(result.find("command '" + key_cmd + "'") != std::string::npos, "Keybinding command not found");
 
-    BOOST_TEST_REQUIRE(result.find("binding '" + key_bind + "'") != std::string::npos, "Keybinding binding not found");
+    BOOST_TEST(result.find("binding '" + key_bind + "'") != std::string::npos, "Keybinding binding not found");
 
+    std::cout << "DEBUG RESTORING DCONF" << std::endl;
     // restore dconf
     dconf_settings.dconfRestore();
 
 
     // check if key was removed from custom-keybindings
     key_list = dconf_settings.getCustomKeybindings();
-    std::cout << "debug key_list: " << key_list << std::endl;
+    std::cout << "debug (after restore) key_list: " << key_list << std::endl;
 
-    BOOST_TEST_REQUIRE(key_list.find(dconf_settings.name_prepend + name) == std::string::npos, "Keybinding was found in custom-keybindings after restore");
+    BOOST_TEST(key_list.find(dconf_settings.name_prepend + name) == std::string::npos, "Keybinding was found in custom-keybindings after restore");
 
 }
 
