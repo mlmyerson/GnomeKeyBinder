@@ -13,12 +13,12 @@ namespace KeyBinder
     private:
         const std::string custom_keybindings_dot_schema_path = "org.gnome.settings-daemon.plugins.media-keys";
         const std::string custom_keybindings_slash_schema_path = "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/";
+        const std::string temp_file = "/tmp/dconf_backup.ini";
 
         std::string dconf_backup_store;
 
     public:
         std::string name_prepend = "custom_";
-
 
         std::string dconfBackup()
         {
@@ -29,14 +29,18 @@ namespace KeyBinder
 
         void dconfRestore()
         {
-            std::string temp_file = "/tmp/dconf_backup_" + std::to_string(getpid()) + ".ini";
-            std::ofstream ofs(temp_file);
-            ofs << dconf_backup_store;
-            ofs.close();
-
-            const std::string cmd = "dconf load / < " + temp_file;
+            // Use sh -c to ensure shell interprets the redirection correctly
+            std::string cmd = "sh -c \"dconf load / < " + temp_file + "\"";
             exec(cmd);
+            // Delete dconf cache
+            cmd = "rm -rf ~/.config/dconf";
+            //exec(cmd);
+            // Force dconf to reload by killing the service (it will restart automatically)
+            cmd = "killall dconf-service";
+            //exec(cmd);
 
+            // Give the service a moment to restart if needed
+            usleep(100000); // 100ms
             std::remove(temp_file.c_str());
         }
 
@@ -51,55 +55,72 @@ namespace KeyBinder
         {
             // get the current list
             std::string bindings_list = getCustomKeybindings();
+            std::cout << "debug bindings_list: " << bindings_list << std::endl;
+
+            bool empty_list = false;
+            auto brack1_pos = bindings_list.find("[");
+            auto brack2_pos = bindings_list.find("]");
+            std::cout << "debug brack1 " << brack1_pos << std::endl;
+            std::cout << "debug brack2 " << brack2_pos << std::endl;
+            if (brack1_pos == std::string::npos || brack2_pos == std::string::npos)
+            {
+                std::cerr << "Error: Invalid format for custom keybindings list." << std::endl;
+                return;
+            //check if brackets are enxt to each other "[]"
+            } else if (brack2_pos - brack1_pos == 1)
+            {
+                empty_list = true;
+            }
 
             // check if first item in list
             std::string add_comma;
-            bindings_list == "[]" ? add_comma = "" : add_comma = ",";
+            empty_list ? add_comma = "" : add_comma = ",";
 
             std::string new_key = name_prepend + name;
             // append new key to list
             bindings_list.insert(bindings_list.length() - 2, add_comma + "'" + custom_keybindings_slash_schema_path + new_key + "/'");
 
-
             // set the new list
             std::string cmd = "gsettings set " + custom_keybindings_dot_schema_path + " custom-keybindings " + bindings_list;
+            std::cout << "debug cmd: " << cmd << std::endl;
             exec(cmd);
 
             // set name
             cmd = "gsettings set " + custom_keybindings_dot_schema_path + ".custom-keybinding:" + custom_keybindings_slash_schema_path + new_key + "/ name '" + name + "'";
-            
 
             // Escape the command properly for shell execution
             std::string escaped_cmd = key_command;
-            
+
             // First, replace any existing double quotes with escaped quotes
             std::string::size_type pos = 0;
-            while ((pos = escaped_cmd.find("\"", pos)) != std::string::npos) {
+            while ((pos = escaped_cmd.find("\"", pos)) != std::string::npos)
+            {
                 escaped_cmd.replace(pos, 1, "\\\"");
                 pos += 2;
             }
-            
-            // Use double quotes around the whole command parameter
-            cmd = "gsettings set " + custom_keybindings_dot_schema_path + 
-                  ".custom-keybinding:" + custom_keybindings_slash_schema_path + 
-                  new_key + "/ command \"" + escaped_cmd + "\"";
-            
-            exec(cmd);
 
+            // Use double quotes around the whole command parameter
+            cmd = "gsettings set " + custom_keybindings_dot_schema_path +
+                  ".custom-keybinding:" + custom_keybindings_slash_schema_path +
+                  new_key + "/ command \"" + escaped_cmd + "\"";
+
+            exec(cmd);
 
             // set keybinding
             cmd = "gsettings set " + custom_keybindings_dot_schema_path + ".custom-keybinding:" + custom_keybindings_slash_schema_path + new_key + "/ binding '" + binding + "'";
             exec(cmd);
         }
 
-
         DconfSettings()
         {
             // Backup dconf settings
             dconf_backup_store = dconfBackup();
+            std::ofstream ofs(temp_file);
+            ofs << dconf_backup_store;
+            ofs.close();
         }
 
-        ~DconfSettings(){}
+        ~DconfSettings() {}
     };
 }
 

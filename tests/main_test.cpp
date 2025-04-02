@@ -32,13 +32,10 @@ BOOST_AUTO_TEST_CASE(test_dconf_backup)
     // check if key was added to custom-keybindings
     std::string key_list = dconf_settings.getCustomKeybindings();
 
-    bool found = false;
-    if (key_list.find(dconf_settings.name_prepend + name) != std::string::npos)
-    {
-        found = true;
-    }
+    // check if key was removed from custom-keybindings
+    std::cout << "debug key_list: " << key_list << std::endl;
 
-    BOOST_TEST_REQUIRE(found, "Keybinding not found in custom-keybindings");
+    BOOST_TEST_REQUIRE(key_list.find(dconf_settings.name_prepend + name) != std::string::npos, "Keybinding not found in custom-keybindings");
 
     // check if the name, command, and binding were set correctly
     std::string result = KeyBinder::exec("gsettings list-recursively org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/" + dconf_settings.name_prepend + name + "/");
@@ -51,6 +48,15 @@ BOOST_AUTO_TEST_CASE(test_dconf_backup)
 
     // restore dconf
     dconf_settings.dconfRestore();
+
+
+    // check if key was removed from custom-keybindings
+    key_list = dconf_settings.getCustomKeybindings();
+    std::cout << "debug key_list: " << key_list << std::endl;
+
+    BOOST_TEST_REQUIRE(key_list.find(dconf_settings.name_prepend + name) == std::string::npos, "Keybinding was found in custom-keybindings after restore");
+
 }
+
 
 BOOST_AUTO_TEST_SUITE_END()
