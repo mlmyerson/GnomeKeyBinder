@@ -1,0 +1,37 @@
+******set VOLUME UP command
+
+gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings \
+"['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
+
+*****set keys of VOLUME UP command
+
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name 'Volume Up Custom'
+
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ command 'pactl set-sink-volume @DEFAULT_SINK@ +5%'
+
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ binding '<Ctrl>F3'
+
+
+
+
+*****GET key paths
+
+gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings
+
+****get all keys of custom0
+
+gsettings list-recursively org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/
+
+***get specific key of custom0
+gsettings get org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name
+
+
+
+RESETING
+
+***reset specific key of custom0
+gsettings reset org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name 
+
+gsettings reset-recursively org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/
+
+

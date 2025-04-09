@@ -1,0 +1,13 @@
+1. list all of the custom keys and their sub key-vals
+
+2. create a custom key in the path
+
+3. create a custom key name/binding/command for a key
+
+4. reset an entire custom key and its subkeys
+
+5. reset a custom key name/binding/command for a key
+
+6. change a custom key name (reset everything and re-add subkeys)
+
+7. change a custom key name/binding/command (reset it and add new stuff)
