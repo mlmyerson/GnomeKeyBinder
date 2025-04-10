@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE MyTestModule
 #include <boost/test/included/unit_test.hpp> // Use the header-only version
 #include <iostream>
-#include "DconfSettings.h"
+#include "KeyBinder.h"
 #include "Utilities.h"
 #include <regex>
 
@@ -52,62 +52,79 @@ BOOST_AUTO_TEST_CASE(test_custom_subkeys)
     std::string command = "echo test_command";
     std::string binding = "<Ctrl>h";
     KeyBinder::KeyBinder Binder;
+
     Binder.setCustomKeybinding(keybinding_name);
     Binder.setCustomKeybindingSubkeys(keybinding_name, command, binding);
     std::string result = KeyBinder::exec(Binder.getCustomKeySubKeys(keybinding_name).c_str());
+
     bool found_name = result.find("name " + keybinding_name) != std::string::npos;
     bool found_command = result.find("command " + command) != std::string::npos;
     bool found_binding = result.find("binding " + binding) != std::string::npos;
-    BOOST_TEST(found_name, "Keybinding name found after removal");
-    BOOST_TEST(found_command, "Command found after removal");
-    BOOST_TEST(found_binding, "Binding pattern found after removal");
+    BOOST_TEST(found_name, "Keybinding name not found");
+    BOOST_TEST(found_command, "Command not found");
+    BOOST_TEST(found_binding, "Binding pattern not found");
+
+    Binder.removeCustomKeyBindingSubKey(keybinding_name, keybinding_name); 
+    Binder.removeCustomKeyBindingSubKey(keybinding_name, command); 
+    Binder.removeCustomKeyBindingSubKey(keybinding_name, binding); 
+
+    found_name = result.find("name " + keybinding_name) != std::string::npos;
+    found_command = result.find("command " + command) != std::string::npos;
+    found_binding = result.find("binding " + binding) != std::string::npos;
+    BOOST_TEST(!found_name, "Keybinding name was found after removal");
+    BOOST_TEST(!found_command, "Command was found after removal");
+    BOOST_TEST(!found_command, "Command was found after removal");
 }
 
+BOOST_AUTO_TEST_CASE(test_edit_keybinding)
+{
+    std::string keybinding_name_1 = "custom_test_1";
+    std::string keybinding_name_2 = "custom_test_2";
 
+    KeyBinder::KeyBinder Binder;
+    Binder.setCustomKeybinding(keybinding_name);
+    Binder.editCustomKeyBinding(keybinding_name_1, keybinding_name_2);
 
+    std::string result = KeyBinder::exec(Binder.getCustomKeysPath().c_str());
+    BOOST_TEST(result.find(keybinding_name_1) == std::string::npos, "Original Keybinding name found after replacement");
+    BOOST_TEST(result.find(keybinding_name_2) != std::string::npos, "New Keybinding name not found");
+}
 
+BOOST_AUTO_TEST_CASE(test_edit_subkey)
+{
+    std::string keybinding_name_1 = "custom_test_1";
+    std::string command = "echo test_command";
+    std::string binding = "<Ctrl>h";
+    KeyBinder::KeyBinder Binder;
 
-// // test dconf backup and restore
-// BOOST_AUTO_TEST_CASE(test_dconf_backup)
-// {
-//     // backup dconf
-//     KeyBinder::DconfSettings dconf_settings;
+    Binder.setCustomKeybinding(keybinding_name_1);
+    Binder.setCustomKeybindingSubkeys(keybinding_name_1, command, binding);
+    std::string result = KeyBinder::exec(Binder.getCustomKeySubKeys(keybinding_name_1).c_str());
 
-//     // add a setting to gsettings
-//     std::string name = "test_keybinding";
-//     std::string key_cmd = "echo Hello World";
-//     std::string key_bind = "<Ctrl>h";
-//     dconf_settings.addKeyBinding(name, key_cmd, key_bind);
+    //ensure the keybinding and subkeys are set
+    bool found_name = result.find("name " + keybinding_name_1) != std::string::npos;
+    bool found_command = result.find("command " + command) != std::string::npos;
+    bool found_binding = result.find("binding " + binding) != std::string::npos;
+    BOOST_TEST(found_name, "Keybinding name not found");
+    BOOST_TEST(found_command, "Command not found");
+    BOOST_TEST(found_binding, "Binding pattern not found");
 
-//     // check if key was added to custom-keybindings
-//     std::string key_list = dconf_settings.getCustomKeybindings();
+    //edit the name
+    std::string keybinding_name_2 = "custom_test_2";
+    Binder.editCustomKeyBinding(keybinding_name_1, keybinding_name_2);
+    //edit the subkeys
+    command = "echo test_command_2";
+    binding = "<Ctrl>j";
+    Binder.setCustomKeybindingSubkeys(keybinding_name_2, command, binding);
 
-//     // check if key was removed from custom-keybindings
-//     std::cout << "debug key_list: " << key_list << std::endl;
-
-//     BOOST_TEST(key_list.find(dconf_settings.name_prepend + name) != std::string::npos, "Keybinding not found in custom-keybindings");
-
-//     // check if the name, command, and binding were set correctly
-//     std::string result = KeyBinder::exec("gsettings list-recursively org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/" + dconf_settings.name_prepend + name + "/");
-
-//     BOOST_TEST(result.find("name '" + name + "'") != std::string::npos, "Keybinding name not found");
-
-//     BOOST_TEST(result.find("command '" + key_cmd + "'") != std::string::npos, "Keybinding command not found");
-
-//     BOOST_TEST(result.find("binding '" + key_bind + "'") != std::string::npos, "Keybinding binding not found");
-
-//     std::cout << "DEBUG RESTORING DCONF" << std::endl;
-//     // restore dconf
-//     dconf_settings.dconfRestore();
-
-
-//     // check if key was removed from custom-keybindings
-//     key_list = dconf_settings.getCustomKeybindings();
-//     std::cout << "debug (after restore) key_list: " << key_list << std::endl;
-
-//     BOOST_TEST(key_list.find(dconf_settings.name_prepend + name) == std::string::npos, "Keybinding was found in custom-keybindings after restore");
-
-// }
+    //ensure the keybinding and subkeys are set
+    found_name = result.find("name " + keybinding_name_2) != std::string::npos;
+    found_command = result.find("command " + command) != std::string::npos;
+    found_binding = result.find("binding " + binding) != std::string::npos;
+    BOOST_TEST(found_name, "New Keybinding name not found");
+    BOOST_TEST(found_command, "New Command not found");
+    BOOST_TEST(found_binding, "New Binding pattern not found");
+}
 
 
 BOOST_AUTO_TEST_SUITE_END()
