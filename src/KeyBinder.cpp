@@ -15,7 +15,11 @@ std::string GnomeKeyBinder::KeyBinder::getPathByName(const std::string &name) co
         reverse_index = 0;
     }
     //substring from reverse index to the length of the name
-    std::string path = paths.substr(reverse_index, pos + name.length() - 1);
+    std::string path = paths.substr(reverse_index, pos + name.length());
+
+    //remove apostrophes
+    path.erase(std::remove(path.begin(), path.end(), '\''), path.end());
+
     return path;
 }
 
@@ -27,7 +31,8 @@ std::string GnomeKeyBinder::KeyBinder::getCustomKeysPath() const
 
 std::string GnomeKeyBinder::KeyBinder::getCustomKeySubKeys(const std::string &name) const
 {
-    return "/path/to/custom/keys/" + name; // Replace with actual path
+    std::string exec_cmd = "gsettings list-recursively " + dot_schema_path + ":" + getPathByName(name);
+    return exec(exec_cmd); // Replace with actual path
 }
 
 void GnomeKeyBinder::KeyBinder::setCustomKeybinding(const std::string &name)
