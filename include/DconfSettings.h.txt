@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include "Utilities.h"
 
-namespace KeyBinder
+namespace GnomeKeyBinder
 {
     class DconfSettings
     {
