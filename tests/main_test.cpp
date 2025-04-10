@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(test_edit_keybinding)
     std::string keybinding_name_2 = "custom_test_2";
 
     KeyBinder::KeyBinder Binder;
-    Binder.setCustomKeybinding(keybinding_name);
+    Binder.setCustomKeybinding(keybinding_name_1);
     Binder.editCustomKeyBinding(keybinding_name_1, keybinding_name_2);
 
     std::string result = KeyBinder::exec(Binder.getCustomKeysPath().c_str());
