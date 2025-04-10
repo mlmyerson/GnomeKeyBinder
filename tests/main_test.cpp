@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(test_get_custom_keys_path)
 }
 
 // Set and remove a custom keybinding
-BOOST_AUTO_TEST_CASE(test_set_custom_keybinding)
+BOOST_AUTO_TEST_CASE(test_custom_keybinding)
 {
     std::string keybinding_name = "custom_test";
     KeyBinder::KeyBinder Binder;
@@ -43,6 +43,24 @@ BOOST_AUTO_TEST_CASE(test_set_custom_keybinding)
     Binder.removeCustomKeybinding(keybinding_name);
     result = KeyBinder::exec(Binder.getCustomKeysPath().c_str());
     BOOST_TEST(result.find(keybinding_name) == std::string::npos, "Keybinding name found after removal");
+}
+
+//Set and remove subkeys of a custom keybinding
+BOOST_AUTO_TEST_CASE(test_custom_subkeys) 
+{
+    std::string keybinding_name = "custom_test";
+    std::string command = "echo test_command";
+    std::string binding = "<Ctrl>h";
+    KeyBinder::KeyBinder Binder;
+    Binder.setCustomKeybinding(keybinding_name);
+    Binder.setCustomKeybindingSubkeys(keybinding_name, command, binding);
+    std::string result = KeyBinder::exec(Binder.getCustomKeySubKeys(keybinding_name).c_str());
+    bool found_name = result.find("name " + keybinding_name) != std::string::npos;
+    bool found_command = result.find("command " + command) != std::string::npos;
+    bool found_binding = result.find("binding " + binding) != std::string::npos;
+    BOOST_TEST(found_name, "Keybinding name found after removal");
+    BOOST_TEST(found_command, "Command found after removal");
+    BOOST_TEST(found_binding, "Binding pattern found after removal");
 }
 
 
