@@ -3,11 +3,13 @@
 
 #include <string>
 
-namespace KeyBinder
+namespace GnomeKeyBinder
 {
     class KeyBinder
     {
         public:
+
+            const std::string dot_schema_path = "org.gnome.settings-daemon.plugins.media-keys";
             KeyBinder();
             ~KeyBinder();
 
@@ -54,6 +56,13 @@ namespace KeyBinder
              * @param new_name The new name of the custom keybinding.
              */
             void editCustomKeyBinding(const std::string &old_name, const std::string &new_name);
+
+        private:
+            /**
+             * @brief Returns the path of a keybinding by its name.
+             * @param name The name of the keybinding.
+             */
+            std::string getPathByName(const std::string &name) const;
     };
 }
 

@@ -4,7 +4,7 @@
 #include <boost/process.hpp>
 #include <boost/process/search_path.hpp>
 
-namespace KeyBinder
+namespace GnomeKeyBinder
 {
 
     inline std::string exec(const std::string &cmd)
