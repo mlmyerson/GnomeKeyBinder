@@ -1,14 +1,22 @@
 #include "KeyBinder.h"
 #include "Utilities.h"
 
+
 std::string GnomeKeyBinder::KeyBinder::getPathByName(const std::string &name) const
 {
     std::string paths = getCustomKeysPath();
     //search string for name
     size_t pos = paths.find(name);
-    //reverse search from name to the first comma or open bracket
-
+    //reverse search from name to the first comma or beginning of list
+    size_t reverse_index = paths.rfind(",", pos);
+    if (reverse_index == std::string::npos)
+    {
+        //open bracket at position 0
+        reverse_index = 0;
+    }
     //substring from reverse index to the length of the name
+    std::string path = paths.substr(reverse_index, pos + name.length() - 1);
+    return path;
 }
 
 

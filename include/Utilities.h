@@ -7,6 +7,10 @@
 namespace GnomeKeyBinder
 {
 
+    /**
+     * @brief Executes a shell command and returns the output as a string.
+     * @param cmd The command to execute.
+     */
     inline std::string exec(const std::string &cmd)
     {
         namespace bp = boost::process;
@@ -35,6 +39,8 @@ namespace GnomeKeyBinder
 
         return result;
     }
+
+    
 }
 
 #endif // UTILITIES_H
