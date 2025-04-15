@@ -56,6 +56,8 @@ void GnomeKeyBinder::KeyBinder::setCustomKeybinding(const std::string &name)
     // check if first item in list
     std::string add_comma;
     empty_list ? add_comma = "" : add_comma = ",";
+
+    exec("gsettings set " + dot_schema_path + " custom-keybindings " + add_comma + "['" + name + "']");
 }
 
 void GnomeKeyBinder::KeyBinder::setCustomKeybindingSubkeys(const std::string &name, const std::string &key_command, const std::string &binding)
@@ -68,7 +70,23 @@ void GnomeKeyBinder::KeyBinder::setCustomKeybindingSubkeys(const std::string &na
 
 void GnomeKeyBinder::KeyBinder::removeCustomKeybinding(const std::string &name)
 {
-    // Implementation to remove a custom keybinding
+    std::string paths = getCustomKeysPath();
+    // search string for name
+    size_t pos = paths.find(name);
+    // reverse search from name to the first comma or beginning of list
+    size_t reverse_index = paths.rfind(",", pos);
+    if (reverse_index == std::string::npos)
+    {
+        // open bracket at position 0
+        reverse_index = 0;
+    }
+    // substring from reverse index to the length of the name
+    std::string path = paths.substr(reverse_index, pos + name.length());
+
+    paths.erase(path.begin(), path.end());
+
+    exec("gsettings set " + dot_schema_path + " custom-keybindings " + paths);
+
 }
 
 void GnomeKeyBinder::KeyBinder::removeCustomKeyBindingSubKey(const std::string &name, const std::string &subkey)
