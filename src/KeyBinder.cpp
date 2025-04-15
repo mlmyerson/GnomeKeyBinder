@@ -91,10 +91,38 @@ void GnomeKeyBinder::KeyBinder::removeCustomKeybinding(const std::string &name)
 
 void GnomeKeyBinder::KeyBinder::removeCustomKeyBindingSubKey(const std::string &name, const std::string &subkey)
 {
-    // Implementation to remove a custom keybinding's subkeys
+    std::string path = getPathByName(name);
+    exec("gsettings reset " + dot_schema_path + ":" + path + " " + subkey);
 }
 
 void GnomeKeyBinder::KeyBinder::editCustomKeyBinding(const std::string &old_name, const std::string &new_name)
 {
-    // Implementation to edit a custom keybinding's name
+    //remove everything and reset everything
+    //get subkeys first 
+    std::string subkeys = getCustomKeySubKeys(old_name);
+    // search for each subkey
+    /*
+    org.gnome.settings-daemon.plugins.media-keys.custom-keybinding binding ''
+    org.gnome.settings-daemon.plugins.media-keys.custom-keybinding command ''
+    org.gnome.settings-daemon.plugins.media-keys.custom-keybinding name ''
+ 
+    */
+    size_t subkey_substr_pos = subkeys.find("name '");
+    size_t next_apostophe = subkeys.find("'", subkey_substr_pos );
+    std::string name_subkey = subkeys.substr(subkey_substr_pos, next_apostophe - subkey_substr_pos);
+
+    subkey_substr_pos = subkeys.find("command '");
+    next_apostophe = subkeys.find("'", subkey_substr_pos );
+    std::string command_subkey = subkeys.substr(subkey_substr_pos, next_apostophe - subkey_substr_pos);
+
+    subkey_substr_pos = subkeys.find("binding '");
+    next_apostophe = subkeys.find("'", subkey_substr_pos );
+    std::string binding_subkey = subkeys.substr(subkey_substr_pos, next_apostophe - subkey_substr_pos);
+
+    // remove the old keybinding
+    removeCustomKeybinding(old_name);
+    
+    // set the new keybinding
+    setCustomKeybinding(new_name);
+    setCustomKeybindingSubkeys(new_name, command_subkey, binding_subkey);
 }
