@@ -13,6 +13,7 @@ namespace GnomeKeyBinder
      */
     inline std::string exec(const std::string &cmd)
     {
+        std::cout << "Executing command: " << cmd << std::endl; // Debug
         namespace bp = boost::process;
 
         std::string result;
@@ -38,6 +39,21 @@ namespace GnomeKeyBinder
         }
 
         return result;
+    }
+
+    /**
+     * @brief Remove frist instance of a substring from a string.
+     * @param str The string to modify.
+     * @param substr The substring to remove.
+     */
+    inline std::string remove_first_instance(std::string str, const std::string &substr)
+    {
+        size_t pos = str.find(substr);
+        if (pos != std::string::npos)
+        {
+            str.erase(pos, substr.length());
+        }
+        return str;
     }
 
     
