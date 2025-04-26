@@ -22,10 +22,10 @@ BOOST_AUTO_TEST_CASE(test_gsettings_access)
 // List custom keys paths
 BOOST_AUTO_TEST_CASE(test_get_custom_keys_path)
 {
-    KeyBinder::KeyBinder Binder;
+    GnomeKeyBinder::KeyBinder Binder;
     std::regex pattern(R"(\[.*\])");
     std::smatch match;
-    std::string result = KeyBinder::exec(Binder.getCustomKeysPath().c_str());
+    std::string result = GnomeKeyBinder::exec(Binder.getCustomKeysPath().c_str());
     bool search = std::regex_search(result, match, pattern);
     BOOST_TEST(search, "Key paths list not returned.");
 }
@@ -34,14 +34,14 @@ BOOST_AUTO_TEST_CASE(test_get_custom_keys_path)
 BOOST_AUTO_TEST_CASE(test_custom_keybinding)
 {
     std::string keybinding_name = "custom_test";
-    KeyBinder::KeyBinder Binder;
+    GnomeKeyBinder::KeyBinder Binder;
 
     Binder.setCustomKeybinding(keybinding_name);
-    std::string result = KeyBinder::exec(Binder.getCustomKeysPath().c_str());
+    std::string result = GnomeKeyBinder::exec(Binder.getCustomKeysPath().c_str());
     BOOST_TEST(result.find(keybinding_name) != std::string::npos, "Keybinding name not found");
 
     Binder.removeCustomKeybinding(keybinding_name);
-    result = KeyBinder::exec(Binder.getCustomKeysPath().c_str());
+    result = GnomeKeyBinder::exec(Binder.getCustomKeysPath().c_str());
     BOOST_TEST(result.find(keybinding_name) == std::string::npos, "Keybinding name found after removal");
 }
 
@@ -51,11 +51,11 @@ BOOST_AUTO_TEST_CASE(test_custom_subkeys)
     std::string keybinding_name = "custom_test";
     std::string command = "echo test_command";
     std::string binding = "<Ctrl>h";
-    KeyBinder::KeyBinder Binder;
+    GnomeKeyBinder::KeyBinder Binder;
 
     Binder.setCustomKeybinding(keybinding_name);
     Binder.setCustomKeybindingSubkeys(keybinding_name, command, binding);
-    std::string result = KeyBinder::exec(Binder.getCustomKeySubKeys(keybinding_name).c_str());
+    std::string result = GnomeKeyBinder::exec(Binder.getCustomKeySubKeys(keybinding_name).c_str());
 
     bool found_name = result.find("name " + keybinding_name) != std::string::npos;
     bool found_command = result.find("command " + command) != std::string::npos;
@@ -81,11 +81,11 @@ BOOST_AUTO_TEST_CASE(test_edit_keybinding)
     std::string keybinding_name_1 = "custom_test_1";
     std::string keybinding_name_2 = "custom_test_2";
 
-    KeyBinder::KeyBinder Binder;
+    GnomeKeyBinder::KeyBinder Binder;
     Binder.setCustomKeybinding(keybinding_name_1);
     Binder.editCustomKeyBinding(keybinding_name_1, keybinding_name_2);
 
-    std::string result = KeyBinder::exec(Binder.getCustomKeysPath().c_str());
+    std::string result = GnomeKeyBinder::exec(Binder.getCustomKeysPath().c_str());
     BOOST_TEST(result.find(keybinding_name_1) == std::string::npos, "Original Keybinding name found after replacement");
     BOOST_TEST(result.find(keybinding_name_2) != std::string::npos, "New Keybinding name not found");
 }
@@ -95,11 +95,11 @@ BOOST_AUTO_TEST_CASE(test_edit_subkey)
     std::string keybinding_name_1 = "custom_test_1";
     std::string command = "echo test_command";
     std::string binding = "<Ctrl>h";
-    KeyBinder::KeyBinder Binder;
+    GnomeKeyBinder::KeyBinder Binder;
 
     Binder.setCustomKeybinding(keybinding_name_1);
     Binder.setCustomKeybindingSubkeys(keybinding_name_1, command, binding);
-    std::string result = KeyBinder::exec(Binder.getCustomKeySubKeys(keybinding_name_1).c_str());
+    std::string result = GnomeKeyBinder::exec(Binder.getCustomKeySubKeys(keybinding_name_1).c_str());
 
     //ensure the keybinding and subkeys are set
     bool found_name = result.find("name " + keybinding_name_1) != std::string::npos;
