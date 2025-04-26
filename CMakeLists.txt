@@ -18,6 +18,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 set(SOURCES
     ${CMAKE_SOURCE_DIR}/src/main.cpp
+    ${CMAKE_SOURCE_DIR}/src/KeyBinder.cpp
 )
 
 add_executable(GnomeKeyBinder ${SOURCES})
@@ -30,6 +31,7 @@ if(Boost_FOUND)
 
     set(TEST_SOURCES
         ${CMAKE_SOURCE_DIR}/tests/main_test.cpp
+        ${CMAKE_SOURCE_DIR}/src/KeyBinder.cpp
     )
     add_executable(GnomeKeyBinderTest ${TEST_SOURCES})
 
