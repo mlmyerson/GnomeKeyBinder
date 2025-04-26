@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(test_get_custom_keys_path)
     GnomeKeyBinder::KeyBinder Binder;
     std::regex pattern(R"(\[.*\])");
     std::smatch match;
-    std::string result = GnomeKeyBinder::exec(Binder.getCustomKeysPath().c_str());
+    std::string result = Binder.getCustomKeysPath();
     bool search = std::regex_search(result, match, pattern);
     BOOST_TEST(search, "Key paths list not returned.");
 }
@@ -36,17 +36,28 @@ BOOST_AUTO_TEST_CASE(test_custom_keybinding)
     std::string keybinding_name = "custom_test";
     GnomeKeyBinder::KeyBinder Binder;
 
-    Binder.setCustomKeybinding(keybinding_name);
-    std::string result = GnomeKeyBinder::exec(Binder.getCustomKeysPath().c_str());
+    try
+    {
+        Binder.setCustomKeybinding(keybinding_name);
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+        BOOST_TEST(false, "Keybinding name already exists in the list.");
+    }
+
+    std::string result = Binder.getCustomKeysPath();
+    std::cout << "Result: " << result << std::endl; // Debug
     BOOST_TEST(result.find(keybinding_name) != std::string::npos, "Keybinding name not found");
 
     Binder.removeCustomKeybinding(keybinding_name);
     result = GnomeKeyBinder::exec(Binder.getCustomKeysPath().c_str());
     BOOST_TEST(result.find(keybinding_name) == std::string::npos, "Keybinding name found after removal");
+    exit(0); // Debug
 }
 
-//Set and remove subkeys of a custom keybinding
-BOOST_AUTO_TEST_CASE(test_custom_subkeys) 
+// Set and remove subkeys of a custom keybinding
+BOOST_AUTO_TEST_CASE(test_custom_subkeys)
 {
     std::string keybinding_name = "custom_test";
     std::string command = "echo test_command";
@@ -64,9 +75,9 @@ BOOST_AUTO_TEST_CASE(test_custom_subkeys)
     BOOST_TEST(found_command, "Command not found");
     BOOST_TEST(found_binding, "Binding pattern not found");
 
-    Binder.removeCustomKeyBindingSubKey(keybinding_name, keybinding_name); 
-    Binder.removeCustomKeyBindingSubKey(keybinding_name, command); 
-    Binder.removeCustomKeyBindingSubKey(keybinding_name, binding); 
+    Binder.removeCustomKeyBindingSubKey(keybinding_name, keybinding_name);
+    Binder.removeCustomKeyBindingSubKey(keybinding_name, command);
+    Binder.removeCustomKeyBindingSubKey(keybinding_name, binding);
 
     found_name = result.find("name " + keybinding_name) != std::string::npos;
     found_command = result.find("command " + command) != std::string::npos;
@@ -101,7 +112,7 @@ BOOST_AUTO_TEST_CASE(test_edit_subkey)
     Binder.setCustomKeybindingSubkeys(keybinding_name_1, command, binding);
     std::string result = GnomeKeyBinder::exec(Binder.getCustomKeySubKeys(keybinding_name_1).c_str());
 
-    //ensure the keybinding and subkeys are set
+    // ensure the keybinding and subkeys are set
     bool found_name = result.find("name " + keybinding_name_1) != std::string::npos;
     bool found_command = result.find("command " + command) != std::string::npos;
     bool found_binding = result.find("binding " + binding) != std::string::npos;
@@ -109,15 +120,15 @@ BOOST_AUTO_TEST_CASE(test_edit_subkey)
     BOOST_TEST(found_command, "Command not found");
     BOOST_TEST(found_binding, "Binding pattern not found");
 
-    //edit the name
+    // edit the name
     std::string keybinding_name_2 = "custom_test_2";
     Binder.editCustomKeyBinding(keybinding_name_1, keybinding_name_2);
-    //edit the subkeys
+    // edit the subkeys
     command = "echo test_command_2";
     binding = "<Ctrl>j";
     Binder.setCustomKeybindingSubkeys(keybinding_name_2, command, binding);
 
-    //ensure the keybinding and subkeys are set
+    // ensure the keybinding and subkeys are set
     found_name = result.find("name " + keybinding_name_2) != std::string::npos;
     found_command = result.find("command " + command) != std::string::npos;
     found_binding = result.find("binding " + binding) != std::string::npos;
@@ -125,6 +136,5 @@ BOOST_AUTO_TEST_CASE(test_edit_subkey)
     BOOST_TEST(found_command, "New Command not found");
     BOOST_TEST(found_binding, "New Binding pattern not found");
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()
