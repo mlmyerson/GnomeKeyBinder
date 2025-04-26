@@ -2,6 +2,13 @@
 #include "KeyBinder.h"
 #include "Utilities.h"
 
+GnomeKeyBinder::KeyBinder::KeyBinder()
+{
+}
+
+GnomeKeyBinder::KeyBinder::~KeyBinder()
+{
+}
 
 std::string GnomeKeyBinder::KeyBinder::getPathByName(const std::string &name) const
 {
