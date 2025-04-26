@@ -33,7 +33,12 @@ std::string GnomeKeyBinder::KeyBinder::getPathByName(const std::string &name) co
 
 std::string GnomeKeyBinder::KeyBinder::getCustomKeysPath() const
 {
-    return exec("gsettings get " + dot_schema_path + " custom-keybindings");
+    std::string cmd = "gsettings get " + dot_schema_path + " custom-keybindings";
+    std::cout << "Command is: " << cmd << std::endl; // Debug
+    std::string result = exec(cmd);
+    result = remove_first_instance(result, "@as");
+    std::cout << "getCustomKeysPath result: " << result << std::endl; // Debug
+    return result;
 }
 
 std::string GnomeKeyBinder::KeyBinder::getCustomKeySubKeys(const std::string &name) const
@@ -45,6 +50,13 @@ std::string GnomeKeyBinder::KeyBinder::getCustomKeySubKeys(const std::string &na
 void GnomeKeyBinder::KeyBinder::setCustomKeybinding(const std::string &name)
 {
     std::string bindings_list = getCustomKeysPath();
+
+    // check if the name is already in the list
+    if (bindings_list.find(name) != std::string::npos)
+    {
+        throw std::runtime_error("Keybinding name already exists in the list.");
+    }
+
     bool empty_list = false;
     auto brack1_pos = bindings_list.find("[");
     auto brack2_pos = bindings_list.find("]");
@@ -64,7 +76,9 @@ void GnomeKeyBinder::KeyBinder::setCustomKeybinding(const std::string &name)
     std::string add_comma;
     empty_list ? add_comma = "" : add_comma = ",";
 
-    exec("gsettings set " + dot_schema_path + " custom-keybindings " + add_comma + "['" + name + "']");
+    std::cout << "current bindings list: " << bindings_list << std::endl; // Debug
+    std::string new_bindings_list = bindings_list.insert(brack2_pos, add_comma + "'" + slash_schema_path + name + "'");
+    exec("gsettings set " + dot_schema_path + " custom-keybindings "  + new_bindings_list);
 }
 
 void GnomeKeyBinder::KeyBinder::setCustomKeybindingSubkeys(const std::string &name, const std::string &key_command, const std::string &binding)
