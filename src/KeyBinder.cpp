@@ -21,10 +21,10 @@ std::string GnomeKeyBinder::KeyBinder::getPathByName(const std::string &name) co
     if (reverse_index == std::string::npos)
     {
         // open bracket at position 0
-        reverse_index = 0;
+        reverse_index = 1;
     }
     // substring from reverse index to the length of the name
-    std::string path = paths.substr(reverse_index, pos + name.length());
+    std::string path = paths.substr(reverse_index, pos + name.length()+1);
 
     // remove apostrophes
     path.erase(std::remove(path.begin(), path.end(), '\''), path.end());
@@ -82,9 +82,13 @@ void GnomeKeyBinder::KeyBinder::setCustomKeybinding(const std::string &name)
 void GnomeKeyBinder::KeyBinder::setCustomKeybindingSubkeys(const std::string &name, const std::string &key_command, const std::string &binding)
 {
     std::string slash_path = ":" + getPathByName(name);
-    exec("gsettings set " + dot_schema_path + slash_path + " " + "name" + " '" + name + "'");
-    exec("gsettings set " + dot_schema_path + slash_path + " " + "command" + " '" + key_command + "'");
-    exec("gsettings set " + dot_schema_path + slash_path + " " + "binding" + " '" + binding + "'");
+    std::string name_cmd = "gsettings set " + dot_schema_path + slash_path + " " + "name" + " '" + name + "'";
+    std::string command_cmd = "gsettings set " + dot_schema_path + slash_path + " " + "command" + " '" + key_command + "'";
+    std::string binding_cmd = "gsettings set " + dot_schema_path + slash_path + " " + "binding" + " '" + binding + "'";
+    std::cout << "Name Command: " << name_cmd << std::endl; // DEBUG
+    exec(name_cmd);
+    exec(command_cmd);
+    exec(binding_cmd);
 }
 
 void GnomeKeyBinder::KeyBinder::removeCustomKeybinding(const std::string &name)
