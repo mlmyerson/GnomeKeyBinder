@@ -25,6 +25,7 @@ std::string GnomeKeyBinder::KeyBinder::getPathByName(const std::string &name) co
     }
     // substring from reverse index to the length of the name
     std::string path = paths.substr(reverse_index, pos + name.length()+1);
+    path += "/";
 
     // remove apostrophes
     path.erase(std::remove(path.begin(), path.end(), '\''), path.end());
