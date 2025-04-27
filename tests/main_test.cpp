@@ -35,7 +35,6 @@ BOOST_AUTO_TEST_CASE(test_custom_keybinding)
 {
     std::string keybinding_name = "custom_test";
     GnomeKeyBinder::KeyBinder Binder;
-
     try
     {
         Binder.setCustomKeybinding(keybinding_name);
