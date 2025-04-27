@@ -117,7 +117,13 @@ void GnomeKeyBinder::KeyBinder::removeCustomKeybinding(const std::string &name)
         paths.erase(erase_pos + 1, path.length());
     }
 
+    std::cout << "Erasing first comma " << paths.substr(1, 2) << std::endl; // DEBUG
+    if (paths.substr(1, 2) == ", ")
+    {
+        paths.erase(1, 2);
+    }
     std::string cmd = "gsettings set " + dot_schema_path + " custom-keybindings " + paths;
+    std::cout << "Command: " << cmd << std::endl; // DEBUG
     exec(cmd);
 }
 
