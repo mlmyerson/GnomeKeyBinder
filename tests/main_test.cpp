@@ -65,7 +65,8 @@ BOOST_AUTO_TEST_CASE(test_custom_subkeys)
 
     Binder.setCustomKeybinding(keybinding_name);
     Binder.setCustomKeybindingSubkeys(keybinding_name, command, binding);
-    std::string result = GnomeKeyBinder::exec(Binder.getCustomKeySubKeys(keybinding_name).c_str());
+    std::string result = Binder.getCustomKeySubKeys(keybinding_name);
+    std::cout << "Result " << result << std::endl; // DEBUG
 
     bool found_name = result.find("name " + keybinding_name) != std::string::npos;
     bool found_command = result.find("command " + command) != std::string::npos;
@@ -73,6 +74,9 @@ BOOST_AUTO_TEST_CASE(test_custom_subkeys)
     BOOST_TEST(found_name, "Keybinding name not found");
     BOOST_TEST(found_command, "Command not found");
     BOOST_TEST(found_binding, "Binding pattern not found");
+
+    GnomeKeyBinder::exec("gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings []"); // DEBUG
+    exit(0);                                                                                                  // DEBUG
 
     Binder.removeCustomKeyBindingSubKey(keybinding_name, keybinding_name);
     Binder.removeCustomKeyBindingSubKey(keybinding_name, command);
