@@ -27,7 +27,6 @@ namespace GnomeKeyBinder
         /**
          * @brief Set a custom keybinding.
          * @param name The name of the custom keybinding.
-         * @throws std::runtime_error if the name already exists in the list.
          */
         void setCustomKeybinding(const std::string &name);
 

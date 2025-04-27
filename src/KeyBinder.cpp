@@ -53,7 +53,7 @@ void GnomeKeyBinder::KeyBinder::setCustomKeybinding(const std::string &name)
     // check if the name is already in the list
     if (bindings_list.find(name) != std::string::npos)
     {
-        throw std::runtime_error("Keybinding name already exists in the list.");
+        return;
     }
 
     bool empty_list = false;
