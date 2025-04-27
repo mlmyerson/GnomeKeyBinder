@@ -35,7 +35,8 @@ std::string GnomeKeyBinder::KeyBinder::getPathByName(const std::string &name) co
 
 std::string GnomeKeyBinder::KeyBinder::getCustomKeysPath() const
 {
-    std::string cmd = "gsettings get " + dot_schema_path + " custom-keybindings";
+    std::string adjusted_path = remove_first_instance(dot_schema_path, ".custom-keybindings");
+    std::string cmd = "gsettings get " + adjusted_path + " custom-keybindings";
     std::string result = exec(cmd);
     result = remove_first_instance(result, "@as");
     return result;
