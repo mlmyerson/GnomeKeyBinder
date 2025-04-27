@@ -39,6 +39,8 @@ BOOST_AUTO_TEST_CASE(test_custom_keybinding)
     {
         Binder.setCustomKeybinding(keybinding_name);
         std::string result = Binder.getCustomKeysPath();
+        std::cout << "Result: " << result << std::endl; // DEBUG
+        exit(0); // DEBUG
     }
     catch (const std::exception &e)
     {

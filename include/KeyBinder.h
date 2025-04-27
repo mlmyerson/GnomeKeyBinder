@@ -8,7 +8,7 @@ namespace GnomeKeyBinder
     class KeyBinder
     {
     public:
-        const std::string dot_schema_path = "org.gnome.settings-daemon.plugins.media-keys.custom-keybindings";
+        const std::string dot_schema_path = "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding";
         const std::string slash_schema_path = "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/";
 
         KeyBinder();
