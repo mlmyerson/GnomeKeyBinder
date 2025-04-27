@@ -39,6 +39,7 @@ BOOST_AUTO_TEST_CASE(test_custom_keybinding)
     try
     {
         Binder.setCustomKeybinding(keybinding_name);
+        std::string result = Binder.getCustomKeysPath();
     }
     catch (const std::exception &e)
     {
@@ -47,13 +48,11 @@ BOOST_AUTO_TEST_CASE(test_custom_keybinding)
     }
 
     std::string result = Binder.getCustomKeysPath();
-    std::cout << "Result: " << result << std::endl; // Debug
     BOOST_TEST(result.find(keybinding_name) != std::string::npos, "Keybinding name not found");
 
     Binder.removeCustomKeybinding(keybinding_name);
-    result = GnomeKeyBinder::exec(Binder.getCustomKeysPath().c_str());
+    result = Binder.getCustomKeysPath();
     BOOST_TEST(result.find(keybinding_name) == std::string::npos, "Keybinding name found after removal");
-    exit(0); // Debug
 }
 
 // Set and remove subkeys of a custom keybinding

@@ -13,7 +13,6 @@ namespace GnomeKeyBinder
      */
     inline std::string exec(const std::string &cmd)
     {
-        std::cout << "Executing command: " << cmd << std::endl; // Debug
         namespace bp = boost::process;
 
         std::string result;

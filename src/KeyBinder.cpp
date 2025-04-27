@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include "KeyBinder.h"
 #include "Utilities.h"
 
@@ -34,17 +35,15 @@ std::string GnomeKeyBinder::KeyBinder::getPathByName(const std::string &name) co
 std::string GnomeKeyBinder::KeyBinder::getCustomKeysPath() const
 {
     std::string cmd = "gsettings get " + dot_schema_path + " custom-keybindings";
-    std::cout << "Command is: " << cmd << std::endl; // Debug
     std::string result = exec(cmd);
     result = remove_first_instance(result, "@as");
-    std::cout << "getCustomKeysPath result: " << result << std::endl; // Debug
     return result;
 }
 
 std::string GnomeKeyBinder::KeyBinder::getCustomKeySubKeys(const std::string &name) const
 {
     std::string exec_cmd = "gsettings list-recursively " + dot_schema_path + ":" + getPathByName(name);
-    return exec(exec_cmd); 
+    return exec(exec_cmd);
 }
 
 void GnomeKeyBinder::KeyBinder::setCustomKeybinding(const std::string &name)
@@ -76,38 +75,50 @@ void GnomeKeyBinder::KeyBinder::setCustomKeybinding(const std::string &name)
     std::string add_comma;
     empty_list ? add_comma = "" : add_comma = ",";
 
-    std::cout << "current bindings list: " << bindings_list << std::endl; // Debug
     std::string new_bindings_list = bindings_list.insert(brack2_pos, add_comma + "'" + slash_schema_path + name + "'");
-    exec("gsettings set " + dot_schema_path + " custom-keybindings "  + new_bindings_list);
+    exec("gsettings set " + dot_schema_path + " custom-keybindings " + new_bindings_list);
 }
 
 void GnomeKeyBinder::KeyBinder::setCustomKeybindingSubkeys(const std::string &name, const std::string &key_command, const std::string &binding)
 {
     std::string slash_path = ":" + getPathByName(name);
     exec("gsettings set " + dot_schema_path + slash_path + " " + "name" + " '" + name + "'");
-    exec("gsettings set " + dot_schema_path + slash_path + " " + "command" + " '" + key_command+ "'");
+    exec("gsettings set " + dot_schema_path + slash_path + " " + "command" + " '" + key_command + "'");
     exec("gsettings set " + dot_schema_path + slash_path + " " + "binding" + " '" + binding + "'");
 }
 
 void GnomeKeyBinder::KeyBinder::removeCustomKeybinding(const std::string &name)
 {
     std::string paths = getCustomKeysPath();
+
+    // check if paths is empty
+    if (paths == "[]")
+    {
+        return;
+    }
+
     // search string for name
     size_t pos = paths.find(name);
     // reverse search from name to the first comma or beginning of list
     size_t reverse_index = paths.rfind(",", pos);
+
     if (reverse_index == std::string::npos)
     {
         // open bracket at position 0
         reverse_index = 0;
     }
+
     // substring from reverse index to the length of the name
     std::string path = paths.substr(reverse_index, pos + name.length());
+    size_t erase_pos = paths.find(path);
 
-    paths.erase(path.begin(), path.end());
+    if (erase_pos != std::string::npos)
+    {
+        paths.erase(erase_pos + 1, path.length());
+    }
 
-    exec("gsettings set " + dot_schema_path + " custom-keybindings " + paths);
-
+    std::string cmd = "gsettings set " + dot_schema_path + " custom-keybindings " + paths;
+    exec(cmd);
 }
 
 void GnomeKeyBinder::KeyBinder::removeCustomKeyBindingSubKey(const std::string &name, const std::string &subkey)
@@ -118,31 +129,31 @@ void GnomeKeyBinder::KeyBinder::removeCustomKeyBindingSubKey(const std::string &
 
 void GnomeKeyBinder::KeyBinder::editCustomKeyBinding(const std::string &old_name, const std::string &new_name)
 {
-    //remove everything and reset everything
-    //get subkeys first 
+    // remove everything and reset everything
+    // get subkeys first
     std::string subkeys = getCustomKeySubKeys(old_name);
     // search for each subkey
     /*
     org.gnome.settings-daemon.plugins.media-keys.custom-keybinding binding ''
     org.gnome.settings-daemon.plugins.media-keys.custom-keybinding command ''
     org.gnome.settings-daemon.plugins.media-keys.custom-keybinding name ''
- 
+
     */
     size_t subkey_substr_pos = subkeys.find("name '");
-    size_t next_apostophe = subkeys.find("'", subkey_substr_pos );
+    size_t next_apostophe = subkeys.find("'", subkey_substr_pos);
     std::string name_subkey = subkeys.substr(subkey_substr_pos, next_apostophe - subkey_substr_pos);
 
     subkey_substr_pos = subkeys.find("command '");
-    next_apostophe = subkeys.find("'", subkey_substr_pos );
+    next_apostophe = subkeys.find("'", subkey_substr_pos);
     std::string command_subkey = subkeys.substr(subkey_substr_pos, next_apostophe - subkey_substr_pos);
 
     subkey_substr_pos = subkeys.find("binding '");
-    next_apostophe = subkeys.find("'", subkey_substr_pos );
+    next_apostophe = subkeys.find("'", subkey_substr_pos);
     std::string binding_subkey = subkeys.substr(subkey_substr_pos, next_apostophe - subkey_substr_pos);
 
     // remove the old keybinding
     removeCustomKeybinding(old_name);
-    
+
     // set the new keybinding
     setCustomKeybinding(new_name);
     setCustomKeybindingSubkeys(new_name, command_subkey, binding_subkey);
